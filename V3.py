@@ -5,6 +5,7 @@ from email.message import EmailMessage
 import io
 import time
 from email.utils import make_msgid
+import mimetypes
 
 st.set_page_config(layout="wide")
 st.title("🚀 Simple Paste & Send Mailer")
@@ -40,6 +41,11 @@ if df is not None:
         height=300,
         value="Hello {Contact Person},\n\nWe are interested in your capabilities regarding your {Category}."
     )
+    uploaded_attachments = st.file_uploader(
+                "Attach a General File (PDF, DOCX, etc.)", 
+                type=["pdf", "doc", "docx", "png", "jpg", "jpeg", "xlsx"], accept_multiple_files=True
+            )
+
     uploaded_logo = st.file_uploader("Attach Signature Logo", type=["png", "jpg", "jpeg"])
     st.subheader("👀 Live Preview:\n")
     if len(df) > 0:
@@ -99,7 +105,8 @@ if df is not None:
                         msg['To'] = str(target_email).strip()
                         
                         formatted_body = personalized_body.replace("\n", "<br>")
-                        
+
+
                         if uploaded_logo is not None:
                             image_cid = make_msgid() 
                             html_content = f"<html><body>{formatted_body}<br><br><img src='cid:{image_cid[1:-1]}'></body></html>"
@@ -112,6 +119,27 @@ if df is not None:
                         else:
                             html_content = f"<html><body>{formatted_body}</body></html>"
                             msg.set_content(html_content, subtype='html')
+
+                        # 2. GENERAL ATTACHMENT LOGIC MUST GO SECOND
+                        if uploaded_attachments: # Checks if the list has any files inside
+                            for single_file in uploaded_attachments: # Loops through them one by one
+                                file_data = single_file.getvalue()
+                                file_name = single_file.name
+                                
+                                # Guess if it's an application (pdf/doc) or image based on file extension
+                                mime_type, _ = mimetypes.guess_type(file_name)
+                                if mime_type is None:
+                                    mime_type = 'application/octet-stream' # Safe fallback
+                                    
+                                maintype, subtype = mime_type.split('/', 1)
+                                
+                                # Staple the file to the email
+                                msg.add_attachment(
+                                    file_data, 
+                                    maintype=maintype, 
+                                    subtype=subtype, 
+                                    filename=file_name
+                                )
                         
                         server.send_message(msg)
                         status_text.text(f"✅ [{index + 1}/{len(df)}] Sent to: {target_email}")
