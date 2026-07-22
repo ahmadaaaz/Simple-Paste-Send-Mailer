@@ -11,7 +11,6 @@ import re
 st.set_page_config(layout="wide")
 st.title("🚀 Simple Paste & Send Mailer")
 
-st.write('yea')
 # --- STEP 1: PASTE DATA ---
 st.warning("Mail column's title must be " '"Email" or "Email Address"')
 st.subheader("1. Paste Data From Google Sheets")
