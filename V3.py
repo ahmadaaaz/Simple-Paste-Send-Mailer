@@ -6,10 +6,12 @@ import io
 import time
 from email.utils import make_msgid
 import mimetypes
-
+import markdown
+import re
 st.set_page_config(layout="wide")
 st.title("🚀 Simple Paste & Send Mailer")
 
+st.write('yea')
 # --- STEP 1: PASTE DATA ---
 st.warning("Mail column's title must be " '"Email" or "Email Address"')
 st.subheader("1. Paste Data From Google Sheets")
@@ -60,6 +62,10 @@ if df is not None:
         try:
             # This generates the preview dynamically
             preview_body = email_body.format(**selected_row) 
+            
+            # --- THE FIX: Force Streamlit to show every empty line ---
+            preview_body = preview_body.replace("\n", "  \n")
+            
             st.info(f"**Subject:** {email_subject}\n\n{preview_body}\n\n*(Your uploaded logo will appear here)*")
         except KeyError as e:
             st.error(f"⚠️ Missing column in your pasted data: {e}. Check your spelling inside the brackets!")
@@ -104,13 +110,18 @@ if df is not None:
                         msg['From'] = email_user
                         msg['To'] = str(target_email).strip()
                         
-                        formatted_body = personalized_body.replace("\n", "<br>")
-
+                        # --- THE MAGIC FIX FOR BOLD, BULLETS & MULTI-LINES ---
+                        # 1. Preserve multiple consecutive empty lines by turning extra newlines into HTML breaks
+                        processed_body = re.sub(r'\n{1,}', lambda m: '<br>' * (len(m.group(0))), personalized_body)
+                        
+                        # 2. Convert markdown (**bold**, * bullets, etc.) into clean HTML
+                        formatted_body = markdown.markdown(processed_body, extensions=['nl2br'])
+                        # -----------------------------------------------------
 
                         if uploaded_logo is not None:
                             image_cid = make_msgid() 
                             html_content = f"<html><body>{formatted_body}<br><br><img src='cid:{image_cid[1:-1]}'></body></html>"
-                            msg.set_content(html_content, subtype='html') 
+                            msg.set_content(html_content, subtype='html')
                             
                             image_bytes = uploaded_logo.getvalue()
                             file_ext = uploaded_logo.name.split('.')[-1].lower()
@@ -142,10 +153,11 @@ if df is not None:
                                 )
                         # 1. SEND MESSAGE TO RECIPIENT
                         server.send_message(msg)
-
+                        
                         # 3. UPDATE PROGRESS BAR ON SCREEN
                         status_text.text(f"✅ [{index + 1}/{len(df)}] Sent to: {target_email}")
                         progress_bar.progress((index + 1) / len(df))
+                        
                         # 4. WAIT 15 SECONDS BEFORE THE NEXT LOOP
                         timer_placeholder = st.empty()
                         for seconds in range(15, 0, -1):
