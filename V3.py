@@ -6,7 +6,6 @@ import io
 import time
 from email.utils import make_msgid
 import mimetypes
-import imaplib
 
 st.set_page_config(layout="wide")
 st.title("🚀 Simple Paste & Send Mailer")
@@ -143,21 +142,10 @@ if df is not None:
                                 )
                         # 1. SEND MESSAGE TO RECIPIENT
                         server.send_message(msg)
-                        
-                        # 2. SAVE TO ROUNDCUBE 'SENT' FOLDER IMMEDIATELY
-                        try:
-                            # 993 is the standard secure port for IMAP
-                            with imaplib.IMAP4_SSL(smtp_host, 993) as imap:
-                                imap.login(email_user, email_pass)
-                                # 'Sent' is the standard cPanel/Roundcube folder name
-                                imap.append('INBOX.Sent', '', imaplib.Time2Internaldate(time.time()), msg.as_bytes())
-                        except Exception as e:
-                            st.warning(f"Email sent, but couldn't save to Sent folder: {e}")
 
                         # 3. UPDATE PROGRESS BAR ON SCREEN
                         status_text.text(f"✅ [{index + 1}/{len(df)}] Sent to: {target_email}")
                         progress_bar.progress((index + 1) / len(df))
-                        
                         # 4. WAIT 15 SECONDS BEFORE THE NEXT LOOP
                         timer_placeholder = st.empty()
                         for seconds in range(15, 0, -1):
