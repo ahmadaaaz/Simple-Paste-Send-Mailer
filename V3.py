@@ -57,7 +57,6 @@ if df is not None:
     )
     # ---------------------------
     st.subheader("👀 Live Preview:\n")
-    st.subheader("👀 Live Preview:\n")
     if len(df) > 0:
         # 1. Create a list of row numbers from 1 to the total number of rows
         preview_options = list(range(1, len(df) + 1))
@@ -74,7 +73,7 @@ if df is not None:
             # --- THE FIX: Force Streamlit to show every empty line ---
             preview_body = preview_body.replace("\n", "  \n")
             
-            st.info(f"**Subject:** {email_subject}\n\n{preview_body}\n\n*(Your uploaded logo will appear here)*")
+            st.info(f"**Subject:** {email_subject}\n\n{preview_body}\n\n*(Your uploaded logo will appear here)*\n\n{email_disclaimer}")
         except KeyError as e:
             st.error(f"⚠️ Missing column in your pasted data: {e}. Check your spelling inside the brackets!")
 
@@ -124,11 +123,13 @@ if df is not None:
                         
                         # 2. Convert markdown (**bold**, * bullets, etc.) into clean HTML
                         formatted_body = markdown.markdown(processed_body, extensions=['nl2br'])
+                        # --- NEW: Process the disclaimer ---
+                        formatted_disclaimer = markdown.markdown(email_disclaimer, extensions=['nl2br'])
                         # -----------------------------------------------------
 
                         if uploaded_logo is not None:
                             image_cid = make_msgid() 
-                            html_content = f"<html><body>{formatted_body}<br><br><img src='cid:{image_cid[1:-1]}'></body></html>"
+                            html_content = f"<html><body>{formatted_body}<br><br><img src='cid:{image_cid[1:-1]}'><br><br>{formatted_disclaimer}</body></html>"
                             msg.set_content(html_content, subtype='html')
                             
                             image_bytes = uploaded_logo.getvalue()
@@ -136,7 +137,7 @@ if df is not None:
                             img_subtype = 'jpeg' if file_ext == 'jpg' else file_ext 
                             msg.add_related(image_bytes, 'image', img_subtype, cid=image_cid)
                         else:
-                            html_content = f"<html><body>{formatted_body}</body></html>"
+                            html_content = f"<html><body>{formatted_body}<br><br>{formatted_disclaimer}</body></html>"
                             msg.set_content(html_content, subtype='html')
 
                         # 2. GENERAL ATTACHMENT LOGIC MUST GO SECOND
