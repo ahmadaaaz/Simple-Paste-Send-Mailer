@@ -8,11 +8,12 @@ from email.utils import make_msgid
 import mimetypes
 import markdown
 import re
+
 st.set_page_config(layout="wide")
 st.title("🚀 Simple Paste & Send Mailer")
 
 # --- STEP 1: PASTE DATA ---
-st.warning("Mail column's title must be " '"Email" or "Email Address"')
+st.warning("Mail column's title must be " '"Email"')
 st.subheader("1. Paste Data From Google Sheets")
 raw_pasted_data = st.text_area("Copy your rows (including headers) and paste here:", height=250)
 
@@ -48,6 +49,14 @@ if df is not None:
             )
 
     uploaded_logo = st.file_uploader("Attach Signature Logo", type=["png", "jpg", "jpeg"])
+    # --- NEW: Disclaimer Box ---
+    email_disclaimer = st.text_area(
+        "Disclaimer (Appears below the signature logo)", 
+        value="<small><span style='color: gray;'>This email and any attachments are confidential and intended solely for the use of the individual or entity to whom they are addressed.</span></small>",
+        height=100
+    )
+    # ---------------------------
+    st.subheader("👀 Live Preview:\n")
     st.subheader("👀 Live Preview:\n")
     if len(df) > 0:
         # 1. Create a list of row numbers from 1 to the total number of rows
@@ -100,7 +109,7 @@ if df is not None:
                         except KeyError:
                             break # Skip if there's a formatting error
                         
-                        target_email = row_dict.get("Email Address") or row_dict.get("Email")
+                        target_email = row_dict.get("Email")
                         if not target_email or pd.isna(target_email):
                             continue
                         
@@ -111,7 +120,7 @@ if df is not None:
                         
                         # --- THE MAGIC FIX FOR BOLD, BULLETS & MULTI-LINES ---
                         # 1. Preserve multiple consecutive empty lines by turning extra newlines into HTML breaks
-                        processed_body = re.sub(r'\n{1,}', lambda m: '<br>' * (len(m.group(0))), personalized_body)
+                        processed_body = re.sub(r'\n{3,}', lambda m: '<br>' * (len(m.group(0))), personalized_body)
                         
                         # 2. Convert markdown (**bold**, * bullets, etc.) into clean HTML
                         formatted_body = markdown.markdown(processed_body, extensions=['nl2br'])
