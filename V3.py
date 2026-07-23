@@ -52,7 +52,8 @@ if df is not None:
     # --- NEW: Disclaimer Box ---
     email_disclaimer = st.text_area(
         "Disclaimer (Appears below the signature logo)", 
-        value="<small><span style='color: gray;'>This email and any attachments are confidential and intended solely for the use of the individual or entity to whom they are addressed.</span></small>",
+        value='''<span style="color: red;">YASAL UYARI</span>.
+<small><span style='color: gray;'>Bu dosyalar sadece alması amaçlanan şahsi veya tüzel kişiye özeldir. Eğer yetkili alıcı değilseniz içeriği açmanız, açıklamanız, kopyalamanız, yönlendirmeniz ve kullanmanız yasaktır ve bu e-postayı derhal silmeniz gerekmektedir. Bayrakdar Engineering Innovative Industry Co. bu mesajın içerdiği bilgilerin mutlak doğruluğu veya eksiksiz olduğu konusunda herhangi bir garanti vermez. Bu nedenle bu bilgilerin kullanımı ile ilgili kayıplardan sorumlu tutulamaz. Bu mesajın içeriğiyle ilgili sorumluluk yalnızca gönderen kişiye aittir. Bu dosya bilinen bilgisayar virüslerine karşı taranmıştır.</span></small>''',
         height=100
     )
     # ---------------------------
