@@ -14,9 +14,9 @@ st.title("🚀 Simple Paste & Send Mailer")
 
 # --- STEP 1: PASTE DATA ---
 with st.container(border=True):
-    st.write("### :red[USING THE CODE LOCALLY IS SUPER DUPER LOOPER IMPORTANT SINCE STREAMLIT SERVERS ARENT STABLE AND MAY REFRETH THE PAGE AFTER 30-40 MAILS] \n --- \n ")
+    st.write("### :red[USING THE CODE LOCALLY IS SUPER DUPER LOOPER IMPORTANT SINCE STREAMLIT SERVERS ARENT STABLE AND MAY REFRETH THE PAGE AFTER 30-40 MAILS]")
+    
 st.warning("Mail column's title must be " '"Email"')
-
 st.subheader("1. Paste Data From Google Sheets")
 raw_pasted_data = st.text_area("Copy your rows (including headers) and paste here:", height=250)
 
