@@ -10,7 +10,7 @@ import markdown
 import re
 
 st.set_page_config(layout="wide")
-st.title("🚀 Simple Paste & Send Mailer")
+st.write(":rainbow[🚀 Simple Paste & Send Mailer]")
 
 # --- STEP 1: PASTE DATA ---
 with st.container(border=True):
