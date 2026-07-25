@@ -22,7 +22,7 @@ if raw_pasted_data:
     try:
         # Google Sheets copies data separated by tabs (\t). 
         # io.StringIO tricks pandas into reading the raw text string like an actual file.
-        df = pd.read_csv(io.StringIO(raw_pasted_data), sep="\t" or sep=",")
+        df = pd.read_csv(io.StringIO(raw_pasted_data), sep="\t|,")
         st.success("✅ Data read successfully! Preview below:")
         st.dataframe(df)
     except Exception as e:
